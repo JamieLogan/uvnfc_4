@@ -41,7 +41,7 @@ void nfc_send(byte message[]){
      byte NDEF_MSG[PAY_LEN + PRE_PAY_LEN-1];     
      int NDEF_LEN = sizeof(NDEF_MSG);            //store its length in an int
      //Function call prepares the full NDEF message
-     NDEF_prep(NDEF_MSG, PAY_LEN, message[]);   
+     NDEF_prep(NDEF_MSG, PAY_LEN, message);   
 }
 
 
@@ -64,7 +64,7 @@ void Data_From_Phone(){
   for (x=31; x<58; x++){        //get mime type from data
     mime[x-31]=from_phone[x];
   }
-  corr_app=array_cmp(aar, mime_type, 27);  //check if data is from correct app
+  corr_app=array_cmp(data, mime_type, 27);  //check if data is from correct app
   if(corr_app==true){                      //if from correct app
     //Serial.println("correct app");
     for (x=58; x<65; x++){                //get data payload
@@ -74,7 +74,7 @@ void Data_From_Phone(){
     
     
     /****FOR DEV ONLY*** send header back through NFC*/
-     nfcsend(data);
+     nfc_send(data);
     
     //PUT HEADER IN EEPROM 
   

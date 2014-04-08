@@ -59,6 +59,25 @@ void NDEF_prep (byte arr[], int Nlen, byte payload[]){
     arr[LEN_BYTE_PACK] = (PACK_LEN + Nlen);
 
     arr[LEN_BYTE_PAY] = Nlen;
+    
+    
+    
+    
+    /*****************put message in NFC chip******************************************/
+    
+    
+    while(!(nfc.Read_Register(STATUS_REG) & READY)); //wait until READY bit has been set
+
+    //DEV*********CHANGE MESSAGE TO A BITE ARRAY WITH THE ENTIRE MESSAGE INCLUDEING SETUP AAR ECT
+    //write NDEF memory with Capability Container + NDEF message
+    nfc.Write_Continuous(0, MESSAGE, sizeof(MESSAGE));
+
+    //Enable interrupts for End of Read and End of Write
+    nfc.Write_Register(INT_ENABLE_REG, EOW_INT_ENABLE + EOR_INT_ENABLE);
+
+    //Configure INTO pin for active low and enable RF
+    nfc.Write_Register(CONTROL_REG, INT_ENABLE + INTO_DRIVE + RF_ENABLE );
+
 
 
 }

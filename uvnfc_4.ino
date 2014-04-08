@@ -53,7 +53,7 @@ boolean array_cmp(byte a[], byte b[], int len){
   return true;                                       //if we have not returned yet, they are equal
 }
 
-void Data_From_Phone(){
+boolean Data_From_Phone(){
   byte from_phone[100];
   byte mime_type[27] = {
     0x61, 0x70, 0x70, 0x6C, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6F, 0x6E, 0x2F, 0x75, 0x6B, 0x2E,	\
@@ -61,6 +61,10 @@ void Data_From_Phone(){
   int x;
   boolean corr_app;
   nfc.Read_Continuous(0, from_phone, 99);  //Get nfc data
+  
+  
+/************************************************************/
+  
   byte data[7]= {
     0,0,0,0,0,0,0  };
   byte mime[27];
@@ -68,8 +72,9 @@ void Data_From_Phone(){
     mime[x-31]=from_phone[x];
   }
   corr_app=array_cmp(data, mime_type, 27);  //check if data is from correct app
-  if(corr_app==true){                      //if from correct app
+  if(corr_app==true){       //if from correct app
     //Serial.println("correct app");
+    byte correct[]= {0x01, 0x01};
     for (x=58; x<65; x++){                //get data payload
       data[x-58]=from_phone[x];
     }
@@ -77,7 +82,7 @@ void Data_From_Phone(){
 
 
     /****FOR DEV ONLY*** send header back through NFC*/
-    nfc_send(data);
+    nfc_send(correct);
 
     //PUT HEADER IN EEPROM 
 
@@ -86,7 +91,7 @@ void Data_From_Phone(){
   }
   else{      //data comes from wrong phone app
     //Serial.println("wrong app");
-  }
+  }return true;
 }
 
 
@@ -100,6 +105,7 @@ void Data_From_Phone(){
 
 void loop(void) 
 {
+  
   while(!(nfc.Read_Register(STATUS_REG) & READY)); //wait until READY bit has been set
 
 
@@ -118,8 +124,10 @@ void loop(void)
 
   while(1)
   {
+    
     if(into_fired)
     {
+     
       //clear control reg to disable RF
       nfc.Write_Register(CONTROL_REG, INT_ENABLE + INTO_DRIVE); 
       delay(750);
@@ -133,7 +141,7 @@ void loop(void)
       if(flags & EOW_INT_FLAG)      //check if the tag was written to by phone
       {
 
-        Data_From_Phone(); 
+       Data_From_Phone(); 
 
       }
 

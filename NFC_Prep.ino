@@ -62,8 +62,7 @@ void NDEF_prep (byte arr[], int Nlen, byte payload[]){
     
     
     
- nfc.begin()
- delay(1000);
+
 
 
 
@@ -71,14 +70,15 @@ void NDEF_prep (byte arr[], int Nlen, byte payload[]){
 
  /*****************put message in NFC chip******************************************/
 
-  
+    nfc.begin()
+    delay(1000);
 
 
     while(!(nfc.Read_Register(STATUS_REG) & READY)); //wait until READY bit has been set
 
-
-
-    //DEV*********CHANGE MESSAGE TO A BITE ARRAY WITH THE ENTIRE MESSAGE INCLUDEING SETUP AAR ECT
+    //clear control reg to disable RF
+    nfc.Write_Register(CONTROL_REG, INT_ENABLE + INTO_DRIVE); 
+    delay(750);
 
     //write NDEF memory with Capability Container + NDEF message
 
